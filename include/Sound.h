@@ -38,4 +38,6 @@ public:
     void Render();
 
     bool Is(std::string type);
+
+    bool SoundIsPlaying();
 };

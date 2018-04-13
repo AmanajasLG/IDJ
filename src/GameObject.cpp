@@ -62,7 +62,9 @@ void GameObject::RemoveComponent(Component *cpt){
 
     for(int i = components.size();i>=0;i--){
         if(components[i].get() == cpt){
+            cout<<"SENHOR JESUUUUS"<<endl;
             components.erase(components.begin() + i);
+            
             return;
         }
     }
@@ -77,7 +79,7 @@ Component *GameObject::GetComponent(std::string type){
         return nullptr;
     }
 
-    for(int i = components.size();i>=0;i--){
+    for(int i = 0;i<components.size();i++){
         if(components[i]->Is(type)){
             return components[i].get();
         }

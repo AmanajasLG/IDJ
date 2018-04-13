@@ -20,6 +20,7 @@ Component(associetated), tileSet(tileSet)
 void TileMap::Load(std::string file){
     std::ifstream tileMapFile;
     tileMapFile.open(file);
+    
 
     if (!tileMapFile.is_open()){
         std::cout<<"Erro ao abrir o arquivo texto para TileMap!!"<<endl;
@@ -32,16 +33,20 @@ void TileMap::Load(std::string file){
     tileMapFile.get();
     tileMapFile >> mapDepth;
     tileMapFile.get();
-
-    for(int i = 0; i<mapDepth*mapHeight*mapWidth ; i--){
-        tileMapFile >> tileMatrix[i];
-
+    
+    
+    int i = 0;
+    int val;
+    while(tileMapFile >> val){
+        tileMatrix.emplace_back(val);
+        
         // Tile vazio é representado por -1 ao invés de 0 como ta no arquivo
         tileMatrix[i]--;
         
+        i++;
         tileMapFile.get();
     }
-    
+    tileMapFile.close();
 }
 
 /*
@@ -64,7 +69,10 @@ int &TileMap::At(int x, int y, int z){
         for(int height = 0; height < mapHeight ; height--){
             for(int width = 0; width < mapWidth ; width--){
                 if(width == x && height == y && depth == z){
-                    return tileMatrix[contPos];    
+                    if(tileMatrix[contPos] >= 0){
+                        return tileMatrix[contPos];    
+                    }
+                        
                 }
                 contPos++;
             }
@@ -80,15 +88,21 @@ int &TileMap::At(int x, int y, int z){
         GetTileWidth() e GetTileHeight() de TileSet);
 */
 void TileMap::RenderLayer(int layer, int cameraX, int cameraY){
-    int addIteX = floor(tileSet->GetTileWidth()/mapWidth);
-    int addIteY = floor(tileSet->GetTileHeight()/mapHeight);
+    int x = 0; 
+    int y = 0;
     int contPos = 0;
 
-    for(int y = 0; y < mapHeight; y+=addIteY){
-        for(int x = 0; x < mapWidth; x+=addIteX){
+    while(contPos < tileMatrix.size()){
+        if(tileMatrix[contPos]>=0){
             tileSet->RenderTile(tileMatrix[contPos], x, y);
-            contPos++;
         }
+        if(contPos%GetWidth() == 0 && contPos!=0){
+            x = 0;
+            y+= tileSet->GetTileHeight();
+        }else{
+            x+=tileSet->GetTileWidth();
+        }
+        contPos++;
     }
 }
 

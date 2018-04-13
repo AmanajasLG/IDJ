@@ -7,12 +7,11 @@ Sound::Sound(GameObject &associeted) : Component (associeted){
 
 Sound::Sound(GameObject &associeted, std::string file) : Sound::Sound(associeted){
     Open(file);
-    Play();
 }
 
 Sound::~Sound(){
     if(chunk != nullptr){
-        Mix_HaltMusic();
+        Mix_HaltChannel(channel);
     }
 }
 
@@ -48,4 +47,8 @@ bool Sound::Is(std::string type){
         return true;
     }
     return false;
+}
+
+bool Sound::SoundIsPlaying(){
+    return Mix_Playing(channel);
 }

@@ -51,9 +51,7 @@ Game::Game(string title, int width, int height){
         cout<< "Falha ao iniciar OpenAudio()!\n";
         return;
     }
-    Mix_AllocateChannels(32);  
-
-    state = &instance->GetState();  
+    Mix_AllocateChannels(32);    
 
     srand(time(NULL));
 }
@@ -75,9 +73,9 @@ Game::~Game(){
 /*
 Run é um simples loop, que funciona enquanto QuitRequested não retornar true. Dentro desse loop, chamamos Update e Render do estado. Em seguida, chamamos a função SDL_RenderPresent, que força o renderizador passado como argumento a atualizar a tela com as últimas renderizações feitas. Sem chamar essa função, a janela continuará vazia.
 */
-void Game::Run(){ 
+void Game::Run(){
     state->LoadAssets();
-    std::cout<<"É AQUI DE NOVO ESSA MERDA\?!\?!"<<endl;
+    
     while(!state->QuitRequested()){
         state->Update(0);
         state->Render();
@@ -108,11 +106,12 @@ State& Game::GetState(){
 Nesse método, a primeira coisa a se fazer é checar se já há uma instância dela rodando (instance != nullptr), se já existir, o retorne. Se não existir, instancie a primeira (e única!) instância de Game usando new.
 */
 Game& Game::GetInstance(){
+    
     if(instance != nullptr){
         return *instance;
     }
     instance = new Game("Luiza_Amanajas_160056659",1024,600); 
-
+    instance->state = &instance->GetState();
     
     return *instance;
 }

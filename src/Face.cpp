@@ -1,4 +1,6 @@
 #include "../include/Face.h"
+#include "../include/Sound.h"
+#include "../include/Sprite.h"
 #include "../include/GameObject.h"
 
 Face::Face(GameObject &associeted) : Component (associeted){
@@ -12,7 +14,12 @@ void Face::Damage(int damage){
     damage -= hitpoints;
     if(damage<=0){
         associeted.RequestDelete();
-        
+        Sprite* sprite = (Sprite*)associeted.GetComponent("Sprite");
+        associeted.RemoveComponent(sprite);
+        Sound* sound = (Sound*)associeted.GetComponent("Sound");
+        if(sound != nullptr){
+            sound->Play();
+        }
     }
 }
 

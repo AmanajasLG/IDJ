@@ -2,7 +2,6 @@
 #define INCLUDE_SDL_IMAGE
 #define INCLUDE_SDL_MIXER
 #include "../include/SDL_include.h"
-#include "../include/Game.h"
 #include <iostream>
 #include <unordered_map>
 #include <string>

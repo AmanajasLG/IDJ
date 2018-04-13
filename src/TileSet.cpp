@@ -18,6 +18,8 @@ tileHeight(tileHeight), tileWidth(tileWidth)
 
     columns = tileSet->GetWidth()/tileWidth;
     rows = tileSet->GetHeight()/tileHeight;
+    cout<<columns<<endl;
+    cout<<rows<<endl;
 }
 
 /*
@@ -26,13 +28,16 @@ tileHeight(tileHeight), tileWidth(tileWidth)
     no sprite, e renderiza na posição dada.
 */
 void TileSet::RenderTile(unsigned index, float x, float y){
+    //cout<<index<< " "<< x <<" "<< y<<endl;
     unsigned numTiles = columns*rows;
     unsigned contIndex = 0;
     if(index <= (numTiles - 1)){
-        for(int y = 0; y < tileSet->GetWidth(); y += tileWidth){
-            for(int x = 0; x < tileSet->GetHeight(); x += tileHeight){
+        for(int y2 = 0; y2 < tileSet->GetWidth(); y2 += tileWidth){
+            for(int x2 = 0; x2 < tileSet->GetHeight(); x2 += tileHeight){
                 if(contIndex == index){
-                    tileSet->Render(x,y);
+                    tileSet->SetClip(x,y,tileWidth,tileHeight);
+                    tileSet->Render(x2,y2);
+                    cout<<index<< " "<< x2 <<" "<< y2 <<endl;
                 }
                 contIndex++;
             }

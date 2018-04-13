@@ -1,7 +1,6 @@
 #include "../include/Sprite.h" 
 #include "../include/Resources.h"
-
-Game game2 = Game::GetInstance();
+#include "../include/Game.h"
 
 /*
 Seta texture como nullptr (imagem não carregada).
@@ -29,7 +28,6 @@ Sprite::~Sprite(){
 Carrega a imagem indicada pelo caminho file.
 */
 void Sprite::Open(string file){
-
     texture = Resources::GetImage(file);
 
     SDL_QueryTexture(texture,nullptr,nullptr,&width,&height);
@@ -66,7 +64,7 @@ void Sprite::Render(int x, int y){
     dstrect.h = clipRect.h;
     dstrect.w = clipRect.w;
 
-    SDL_RenderCopy(game2.GetRenderer(), texture, &clipRect, &dstrect);   
+    SDL_RenderCopy(Game::GetInstance().GetRenderer(), texture, &clipRect, &dstrect);   
 }
 
 /*

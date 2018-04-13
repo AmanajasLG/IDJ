@@ -42,6 +42,7 @@ Carrega a música indicada no arquivo file.
 */
 void Music::Open(std::string file){
     music = Resources::GetMusic(file);
+    
     Play(-1);
 }
 

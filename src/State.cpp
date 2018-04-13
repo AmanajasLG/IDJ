@@ -9,18 +9,16 @@
 
 
 /* 
-O construtor de State inicializa quitRequested e instancia o Sprite.
+	O construtor de State inicializa quitRequested e instancia o Sprite.
 */ 
 State::State(){
     quitRequested = false;
 
 	// Mudança T2
     GameObject *background = new GameObject();
-	Sound *sound = new Sound(*background);
 	bg = new Sprite(*background);
 
 	background->AddComponent(bg);
-	background->AddComponent(sound);
 	
 	objectArray.emplace_back(std::move(background));
 
@@ -28,8 +26,10 @@ State::State(){
 	GameObject *gameTile = new GameObject();
 	gameTile->box.x = 0;
 	gameTile->box.y = 0;
-	TileSet *tileset = new TileSet(64,64,"../assets/img/tileset.png");
-	TileMap *tilemap = new TileMap(*gameTile,"../assets/map/tileMap.txt", tileset);	
+	TileSet *tileset = new TileSet(64,64,"assets/img/tileset.png");
+	TileMap *tilemap = new TileMap(*gameTile,"assets/map/tileMap.txt", tileset);
+	gameTile->AddComponent(tilemap);
+	objectArray.emplace_back(std::move(gameTile));
 }
 
 State::~State(){
@@ -51,10 +51,8 @@ bool State::QuitRequested(){
 O LoadAssets é uma método que cuida de pré-carregar os assets do state do jogo para que não haja problemas futuros como, por exemplo, o jogo tentar tocar a música antes dela terminar de ser carregada para a memória.
 */
 void State::LoadAssets(){
-	std::cout<<"CARALEOOOOO!!!"<<endl;
+	bg->Open("assets/img/ocean.jpg");	
     music.Open("assets/audio/stageState.ogg");
-	std::cout<<"CARALEOOOOO!!! 2"<<endl;
-    bg->Open("assets/img/ocean.jpg");	
 }
 
 void State::Update(float dt){
@@ -64,12 +62,16 @@ void State::Update(float dt){
 		objectArray[i]->Update(dt);
 	}
 
-	for(int i = 0;(size_t)i<objectArray.size();i++){
+	for(int i = 1;(size_t)i<objectArray.size();i++){
 		if(objectArray[i]->IsDead()){
-			objectArray.erase(objectArray.begin() + i);
+			Sound* sound = (Sound*)objectArray[i]->GetComponent("Sound");
+			if(!sound->SoundIsPlaying()){
+				objectArray.erase(objectArray.begin() + i);
+			}			
 		}
 	}
 }
+
 
 void State::Render(){
     for(int i = 0;(size_t)i<objectArray.size();i++){
