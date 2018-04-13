@@ -77,7 +77,7 @@ Run é um simples loop, que funciona enquanto QuitRequested não retornar true. 
 */
 void Game::Run(){ 
     state->LoadAssets();
-    
+    std::cout<<"É AQUI DE NOVO ESSA MERDA\?!\?!"<<endl;
     while(!state->QuitRequested()){
         state->Update(0);
         state->Render();

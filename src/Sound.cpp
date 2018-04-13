@@ -1,4 +1,5 @@
 #include "../include/Sound.h"
+#include "../include/Resources.h"
 
 Sound::Sound(GameObject &associeted) : Component (associeted){
     chunk = nullptr;
@@ -12,7 +13,6 @@ Sound::Sound(GameObject &associeted, std::string file) : Sound::Sound(associeted
 Sound::~Sound(){
     if(chunk != nullptr){
         Mix_HaltMusic();
-        Mix_FreeChunk(chunk);
     }
 }
 
@@ -32,7 +32,7 @@ void Sound::Stop(){
 }
 
 void Sound::Open(std::string file){
-    chunk = Mix_LoadWAV(file.c_str());
+    chunk = Resources::GetSound(file);
 }
 
 void Sound::Update(float dt){

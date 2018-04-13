@@ -33,6 +33,8 @@ public:
     
     void Render();
 
+    void Render(int mouseX, int mouseY);
+
     bool Is(std::string type);
 
     void Update(float dt);

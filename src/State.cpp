@@ -3,6 +3,8 @@
 #include "../include/Face.h"
 #include "../include/Sound.h"
 #include "../include/Rect.h"
+#include "../include/TileSet.h"
+#include "../include/TileMap.h"
 #include <math.h>
 
 
@@ -11,6 +13,8 @@ O construtor de State inicializa quitRequested e instancia o Sprite.
 */ 
 State::State(){
     quitRequested = false;
+
+	// Mudança T2
     GameObject *background = new GameObject();
 	Sound *sound = new Sound(*background);
 	bg = new Sprite(*background);
@@ -18,7 +22,14 @@ State::State(){
 	background->AddComponent(bg);
 	background->AddComponent(sound);
 	
-	objectArray.emplace_back(std::move(background));	
+	objectArray.emplace_back(std::move(background));
+
+	// Mudança T3
+	GameObject *gameTile = new GameObject();
+	gameTile->box.x = 0;
+	gameTile->box.y = 0;
+	TileSet *tileset = new TileSet(64,64,"../assets/img/tileset.png");
+	TileMap *tilemap = new TileMap(*gameTile,"../assets/map/tileMap.txt", tileset);	
 }
 
 State::~State(){
@@ -40,7 +51,9 @@ bool State::QuitRequested(){
 O LoadAssets é uma método que cuida de pré-carregar os assets do state do jogo para que não haja problemas futuros como, por exemplo, o jogo tentar tocar a música antes dela terminar de ser carregada para a memória.
 */
 void State::LoadAssets(){
+	std::cout<<"CARALEOOOOO!!!"<<endl;
     music.Open("assets/audio/stageState.ogg");
+	std::cout<<"CARALEOOOOO!!! 2"<<endl;
     bg->Open("assets/img/ocean.jpg");	
 }
 

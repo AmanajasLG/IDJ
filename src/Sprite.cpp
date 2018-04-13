@@ -1,7 +1,7 @@
 #include "../include/Sprite.h" 
-#include "../include/Game.h"
+#include "../include/Resources.h"
 
-Game game = Game::GetInstance();
+Game game2 = Game::GetInstance();
 
 /*
 Seta texture como nullptr (imagem não carregada).
@@ -22,25 +22,15 @@ Sprite::Sprite(GameObject &associeted, string file) : Component(associeted){
 Se houver imagem alocada, desaloca.
 */
 Sprite::~Sprite(){
-    if(IsOpen()){
-        SDL_DestroyTexture(texture);
-    }    
+
 }
 
 /*
 Carrega a imagem indicada pelo caminho file.
 */
 void Sprite::Open(string file){
-    if(IsOpen() == true){
-        SDL_DestroyTexture(texture);
-    }
 
-    texture = IMG_LoadTexture(game.GetRenderer(),file.c_str());
-    if(texture == nullptr){
-        cout<< "Erro ao criar textura!" <<endl;
-        cout<< "ERRO: " << SDL_GetError() <<endl;
-        return;
-    }
+    texture = Resources::GetImage(file);
 
     SDL_QueryTexture(texture,nullptr,nullptr,&width,&height);
 
@@ -65,14 +55,18 @@ Render é um wrapper para SDL_RenderCopy, que recebe quatro argumentos.
     ● SDL_Rect* dstrect: O retângulo destino. Determina a posição na tela em que a textura deve ser renderizada membros x e y). Se os membros w e h diferirem das dimensões do clip,causarão uma mudança na escala, contraindo ou expandindo a imagem para se adaptar a esses valores.
 */
 void Sprite::Render(){
+    Sprite::Render(associeted.box.x, associeted.box.y);
+}
+
+void Sprite::Render(int x, int y){
     SDL_Rect dstrect;
     
-    dstrect.x = associeted.box.x; 
-    dstrect.y = associeted.box.y;
+    dstrect.x = x; 
+    dstrect.y = y;
     dstrect.h = clipRect.h;
     dstrect.w = clipRect.w;
 
-    SDL_RenderCopy(game.GetRenderer(), texture, &clipRect, &dstrect);
+    SDL_RenderCopy(game2.GetRenderer(), texture, &clipRect, &dstrect);   
 }
 
 /*

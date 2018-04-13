@@ -1,6 +1,5 @@
 #include "../include/Music.h"
-
-
+#include "../include/Resources.h"
 
 /*
 O segundo construtor chama Open, o primeiro apenas inicializa music como nullptr, para aguardar uma chamada a Open vinda de fora da função.
@@ -16,8 +15,7 @@ Music::Music(std::string file){
 }
 
 Music::~Music(){
-    Stop();
-    Mix_FreeMusic(music); 
+    Stop(); 
 }
 
 /*
@@ -43,12 +41,7 @@ void Music::Stop(int msToStop){
 Carrega a música indicada no arquivo file.
 */
 void Music::Open(std::string file){
-    music = Mix_LoadMUS(file.c_str()); 
-
-    if(!IsOpen()){
-        std::cout<< "Erro! Musica não foi encontrada!" <<endl; 
-    }
-
+    music = Resources::GetMusic(file);
     Play(-1);
 }
 
