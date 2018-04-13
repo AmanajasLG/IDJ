@@ -88,6 +88,9 @@ int &TileMap::At(int x, int y, int z){
         GetTileWidth() e GetTileHeight() de TileSet);
 */
 void TileMap::RenderLayer(int layer, int cameraX, int cameraY){
+    //tileSet->RenderTile(tileMatrix[0], 0, 0);
+    
+    
     int x = 0; 
     int y = 0;
     int contPos = 0;
@@ -96,7 +99,7 @@ void TileMap::RenderLayer(int layer, int cameraX, int cameraY){
         if(tileMatrix[contPos]>=0){
             tileSet->RenderTile(tileMatrix[contPos], x, y);
         }
-        if(contPos%GetWidth() == 0 && contPos!=0){
+        if((contPos+1)%GetWidth() == 0 && contPos!=0){
             x = 0;
             y+= tileSet->GetTileHeight();
         }else{
@@ -104,6 +107,7 @@ void TileMap::RenderLayer(int layer, int cameraX, int cameraY){
         }
         contPos++;
     }
+    
 }
 
 /*

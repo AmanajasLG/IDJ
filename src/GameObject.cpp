@@ -62,7 +62,6 @@ void GameObject::RemoveComponent(Component *cpt){
 
     for(int i = components.size();i>=0;i--){
         if(components[i].get() == cpt){
-            cout<<"SENHOR JESUUUUS"<<endl;
             components.erase(components.begin() + i);
             
             return;
