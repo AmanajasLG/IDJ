@@ -87,20 +87,18 @@ int &TileMap::At(int x, int y, int z){
         ● Deve-se considerar o tamanho de cada tile (use os membros
         GetTileWidth() e GetTileHeight() de TileSet);
 */
-void TileMap::RenderLayer(int layer, int cameraX, int cameraY){
-    //tileSet->RenderTile(tileMatrix[0], 0, 0);
+void TileMap::RenderLayer(int layer, int cameraX, int cameraY){    
     
-    
-    int x = 0; 
-    int y = 0;
-    int contPos = 0;
+    int x = cameraX; 
+    int y = cameraY;
+    uint contPos = 0;
 
     while(contPos < tileMatrix.size()){
         if(tileMatrix[contPos]>=0){
             tileSet->RenderTile(tileMatrix[contPos], x, y);
         }
         if((contPos+1)%GetWidth() == 0 && contPos!=0){
-            x = 0;
+            x = cameraX;
             y+= tileSet->GetTileHeight();
         }else{
             x+=tileSet->GetTileWidth();
@@ -115,7 +113,7 @@ void TileMap::RenderLayer(int layer, int cameraX, int cameraY){
 */
 void TileMap::Render(){
     for(int layer = 0; layer < mapDepth; layer++){
-        RenderLayer(layer, associeted.box.x,associeted.box.y);
+        RenderLayer(layer, associated.box.x,associated.box.y);
     }
     
 }

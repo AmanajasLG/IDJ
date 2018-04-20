@@ -16,7 +16,12 @@ private:
     static Game *instance;
     SDL_Renderer *renderer;
 
+    int frameStart;
+    float dt;
+    
     Game(string title, int width, int height);
+
+    void CalculateDeltaTime();
 
 public:
     ~Game();
@@ -31,5 +36,6 @@ public:
 
     bool TestaSaporra();
 
+    float GetDeltaTime();
 };
 

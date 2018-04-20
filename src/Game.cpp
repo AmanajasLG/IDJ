@@ -1,4 +1,5 @@
 #include "../include/Game.h"
+#include "../include/InputManager.h"
 #include<cstdlib>
 #include<ctime>
 
@@ -6,7 +7,7 @@ Game *Game::instance = nullptr;
 
 
 /*
-Quando a classe é instanciada, a primeira coisa a se fazer é checar se já há uma instância dela rodando (instance != nullptr). Se já existir, há um problema na lógica do seu jogo. Se não existir, atribua this a instance.
+    Quando a classe é instanciada, a primeira coisa a se fazer é checar se já há uma instância dela rodando (instance != nullptr). Se já existir, há um problema na lógica do seu jogo. Se não existir, atribua this a instance.
 */
 Game::Game(string title, int width, int height){
     if(instance != nullptr){
@@ -54,11 +55,14 @@ Game::Game(string title, int width, int height){
     Mix_AllocateChannels(32);    
 
     srand(time(NULL));
+
+    frameStart = SDL_GetTicks();
+    dt = 0;
 }
 
 
 /*
-O destrutor desfaz as inicializações: deleta o estado, encerra a SDL_Music(Mix_CloseAudio e Mix_Quit) e a SDL_image (IMG_Quit), destrói o renderizador e a janela (SDL_DestroyRenderer, SDL_DestroyWindow), e, finalmente, encerra a SDL (SDL_Quit).
+    O destrutor desfaz as inicializações: deleta o estado, encerra a SDL_Music(Mix_CloseAudio e Mix_Quit) e a SDL_image (IMG_Quit), destrói o renderizador e a janela (SDL_DestroyRenderer, SDL_DestroyWindow), e, finalmente, encerra a SDL (SDL_Quit).
 */
 Game::~Game(){
     delete state;
@@ -71,13 +75,15 @@ Game::~Game(){
 }
 
 /*
-Run é um simples loop, que funciona enquanto QuitRequested não retornar true. Dentro desse loop, chamamos Update e Render do estado. Em seguida, chamamos a função SDL_RenderPresent, que força o renderizador passado como argumento a atualizar a tela com as últimas renderizações feitas. Sem chamar essa função, a janela continuará vazia.
+    Run é um simples loop, que funciona enquanto QuitRequested não retornar true. Dentro desse loop, chamamos Update e Render do estado. Em seguida, chamamos a função SDL_RenderPresent, que força o renderizador passado como argumento a atualizar a tela com as últimas renderizações feitas. Sem chamar essa função,a janela continuará vazia.
 */
 void Game::Run(){
     state->LoadAssets();
     
     while(!state->QuitRequested()){
-        state->Update(0);
+        InputManager::GetInstance().Update();
+        CalculateDeltaTime();
+        state->Update(GetDeltaTime());
         state->Render();
         SDL_RenderPresent(renderer);
         SDL_RenderClear(renderer);
@@ -86,14 +92,14 @@ void Game::Run(){
 }
 
 /*
-Retorna renderer
+    Retorna renderer
 */
 SDL_Renderer* Game::GetRenderer(){
     return renderer;    
 }
 
 /*
-Retorna state
+    Retorna state
 */
 State& Game::GetState(){
     if(state == nullptr){
@@ -103,7 +109,7 @@ State& Game::GetState(){
 }
 
 /*
-Nesse método, a primeira coisa a se fazer é checar se já há uma instância dela rodando (instance != nullptr), se já existir, o retorne. Se não existir, instancie a primeira (e única!) instância de Game usando new.
+    Nesse método, a primeira coisa a se fazer é checar se já há uma instância dela rodando (instance != nullptr), se já existir, o retorne. Se não existir, instancie a primeira (e única!) instância de Game usando new.
 */
 Game& Game::GetInstance(){
     
@@ -116,3 +122,16 @@ Game& Game::GetInstance(){
     return *instance;
 }
 
+/*
+    Atribui valor a dt, e deve ser chamada no início de
+    cada iteração do main game loop.
+*/
+void Game::CalculateDeltaTime(){
+    int frameEnd = SDL_GetTicks();
+    dt = floor((frameEnd - frameStart)/10);
+    frameStart = frameEnd;
+}
+
+float Game::GetDeltaTime(){
+    return dt;
+}

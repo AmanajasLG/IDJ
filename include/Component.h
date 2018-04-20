@@ -15,7 +15,7 @@ Todos os componentes do nosso jogo terão, no mínimo, as seguintes característ
 */
 class Component {
 protected:
-    GameObject &associeted; 
+    GameObject &associated; 
 
 public:
     Component(GameObject &associated);

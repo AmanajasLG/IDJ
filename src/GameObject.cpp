@@ -59,7 +59,7 @@ void GameObject::AddComponent(Component *cpt){
 Remove o componente do vetor de componentes.
 */
 void GameObject::RemoveComponent(Component *cpt){
-
+    if (cpt == nullptr) return;
     for(int i = components.size();i>=0;i--){
         if(components[i].get() == cpt){
             components.erase(components.begin() + i);

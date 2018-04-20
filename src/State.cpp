@@ -5,8 +5,9 @@
 #include "../include/Rect.h"
 #include "../include/TileSet.h"
 #include "../include/TileMap.h"
+#include "../include/InputManager.h"
+#include "../include/Camera.h"
 #include <math.h>
-
 
 /* 
 	O construtor de State inicializa quitRequested e instancia o Sprite.
@@ -27,6 +28,7 @@ State::State(){
 	gameTile->box.x = 0;
 	gameTile->box.y = 0;
 	TileSet *tileset = new TileSet(64,64,"assets/img/tileset.png");
+	
 	TileMap *tilemap = new TileMap(*gameTile,"assets/map/tileMap.txt", tileset);
 	gameTile->AddComponent(tilemap);
 	objectArray.emplace_back(std::move(gameTile));
@@ -56,48 +58,8 @@ void State::LoadAssets(){
 }
 
 void State::Update(float dt){
-    Input();
-
-	for(int i = 0;(size_t)i<objectArray.size();i++){
-		objectArray[i]->Update(dt);
-	}
-
-	for(int i = 1;(size_t)i<objectArray.size();i++){
-		if(objectArray[i]->IsDead()){
-			Sound* sound = (Sound*)objectArray[i]->GetComponent("Sound");
-			if(!sound->SoundIsPlaying()){
-				objectArray.erase(objectArray.begin() + i);
-			}			
-		}
-	}
-}
-
-
-void State::Render(){
-    for(int i = 0;(size_t)i<objectArray.size();i++){
-		objectArray[i]->Render();
-	}
-}
-
-void State::Input(){
-
-    SDL_Event event;
-	int mouseX, mouseY;
-
-	// Obtenha as coordenadas do mouse
-	SDL_GetMouseState(&mouseX, &mouseY);
-
-	// SDL_PollEvent retorna 1 se encontrar eventos, zero caso contrário
-	while (SDL_PollEvent(&event)) {
-
-		// Se o evento for quit, setar a flag para terminação
-		if(event.type == SDL_QUIT) {
-			quitRequested = true;
-		}
-		
-		// Se o evento for clique...
-		if(event.type == SDL_MOUSEBUTTONDOWN) {
-
+	for(int i = 0;i<6;i++){
+		if(InputManager::GetInstance().MousePressed(i)) {
 			// Percorrer de trás pra frente pra sempre clicar no objeto mais de cima
 			for(int i = objectArray.size() - 1; i >= 0; --i) {
 				// Obtem o ponteiro e casta pra Face.
@@ -108,7 +70,7 @@ void State::Input(){
 				// Esse código, assim como a classe Face, é provisório. Futuramente, para
 				// chamar funções de GameObjects, use objectArray[i]->função() direto.
 
-				if(go->box.Contains( (float)mouseX, (float)mouseY ) ) {  
+				if(go->box.Contains(InputManager::GetInstance().GetMouseX(), InputManager::GetInstance().GetMouseY()) ) {
 					Face* face = (Face*)go->GetComponent( "Face" );
 					if ( nullptr != face ) {
 						// Aplica dano
@@ -119,22 +81,46 @@ void State::Input(){
 				}
 			}
 		}
-		if( event.type == SDL_KEYDOWN ) {
-			// Se a tecla for ESC, setar a flag de quit
-			if( event.key.keysym.sym == SDLK_ESCAPE ) {
-				quitRequested = true;
-			}
-			// Se não, crie um objeto
-			else {
-				Vec2 vec = Vec2(200, 0);
-				vec.GetRotated( -M_PI + M_PI*(rand() % 1001)/500.0 );
-				Vec2 objPos = objPos.AddVectors(vec, Vec2( mouseX, mouseY ));
-				AddObject((int)objPos.x, (int)objPos.y);
-
-			}
-		}
 	}
-    
+
+    if(InputManager::GetInstance().KeyPressed(SDLK_ESCAPE) || InputManager::GetInstance().QuitRequested()){
+		quitRequested = true;
+	}
+
+	if(InputManager::GetInstance().KeyPressed(SDLK_SPACE)){
+		Vec2 vec = Vec2(200, 0);
+		vec.GetRotated( -M_PI + M_PI*(rand() % 1001)/500.0 );
+		Vec2 objPos = objPos.AddVectors(vec, Vec2( InputManager::GetInstance().GetMouseX(), InputManager::GetInstance().GetMouseY()));
+		AddObject((int)objPos.x, (int)objPos.y);
+	}
+
+	
+	Camera::Update(dt);
+
+	for(int i = 0;(size_t)i<objectArray.size();i++){
+		objectArray[i]->Update(dt);
+	}
+
+	for(int i = 0;(size_t)i<objectArray.size();i++){
+		if(objectArray[i]->IsDead()){
+			Sound* sound = (Sound*)objectArray[i]->GetComponent("Sound");
+			if(!sound->SoundIsPlaying()){
+				objectArray.erase(objectArray.begin() + i);
+			}			
+		}
+		
+	}
+}
+
+
+void State::Render(){
+    for(int i = 0;(size_t)i<objectArray.size();i++){
+		if(objectArray[i]->GetComponent("TileMap") != nullptr){
+			objectArray[i]->box.x = Camera::pos.x;
+			objectArray[i]->box.y = Camera::pos.y;
+		}
+		objectArray[i]->Render();
+	}
 }
 
 void State::AddObject(int mouseX, int mouseY){
@@ -143,17 +129,17 @@ void State::AddObject(int mouseX, int mouseY){
 	Sound *sound = new Sound(*enemy, "assets/audio/boom.wav");
 	Face *face = new Face(*enemy);
 
+	enemy->AddComponent(face);
 	enemy->AddComponent(sprite);
 
 	enemy->box.w = sprite->GetWidth();
 	enemy->box.h = sprite->GetHeight();
 
-	enemy->box.x = mouseX + enemy->box.w/2;
-	enemy->box.y = mouseY + enemy->box.h/2;
+	enemy->box.x = mouseX;
+	enemy->box.y = mouseY;
 
 	
 	enemy->AddComponent(sound);
-	enemy->AddComponent(face);
 	
 	objectArray.emplace_back(std::move(enemy));	
 	
