@@ -135,8 +135,8 @@ void State::AddObject(int mouseX, int mouseY){
 	enemy->box.w = sprite->GetWidth();
 	enemy->box.h = sprite->GetHeight();
 
-	enemy->box.x = mouseX;
-	enemy->box.y = mouseY;
+	enemy->box.x = mouseX - enemy->box.w/2;
+	enemy->box.y = mouseY - enemy->box.h/2;
 
 	
 	enemy->AddComponent(sound);

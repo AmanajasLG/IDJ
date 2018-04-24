@@ -28,7 +28,7 @@ public:
 
     void SetTileSet(TileSet *tileSet);
 
-    int &At(int x, int y, int z = 0);
+    int At(int x, int y, int z = 0);
 
     void Render();
 
@@ -43,4 +43,6 @@ public:
     void Update(float dt);
 
     bool Is(std::string type);
+
+    int ParallaxScrolling(int val);
 };

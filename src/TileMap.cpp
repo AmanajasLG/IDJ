@@ -60,24 +60,10 @@ void TileMap::SetTileSet(TileSet *tileSet){
 /*
     Retorna uma referência ao elemento [x][y][z] de tileMatrix.
 */
-int &TileMap::At(int x, int y, int z){    
-    int contPos = 0;
+int TileMap::At(int x, int y, int z){    
+    int matrix = GetHeight()*GetWidth();
+    return tileMatrix[z*matrix + x + y*GetWidth()];
 
-    // Como a matrix é um vetor, contPos conta as posições lineares do vetor.
-    // For simula a movimentação por matrix para encontra o elemento na posição certa. 
-    for(int depth = 0; depth < mapDepth ; depth--){
-        for(int height = 0; height < mapHeight ; height--){
-            for(int width = 0; width < mapWidth ; width--){
-                if(width == x && height == y && depth == z){
-                    if(tileMatrix[contPos] >= 0){
-                        return tileMatrix[contPos];    
-                    }
-                        
-                }
-                contPos++;
-            }
-        }
-    }
 }
 
 /*
@@ -88,24 +74,21 @@ int &TileMap::At(int x, int y, int z){
         GetTileWidth() e GetTileHeight() de TileSet);
 */
 void TileMap::RenderLayer(int layer, int cameraX, int cameraY){    
-    
     int x = cameraX; 
     int y = cameraY;
-    uint contPos = 0;
+    int valPos;
 
-    while(contPos < tileMatrix.size()){
-        if(tileMatrix[contPos]>=0){
-            tileSet->RenderTile(tileMatrix[contPos], x, y);
+    for(int posY = 0; posY < GetHeight(); posY++){
+        for(int posX = 0; posX < GetWidth(); posX++){
+            valPos = At(posX,posY,layer);
+            if(valPos>=0){
+                tileSet->RenderTile(valPos, x, y);
+            }
+            x+=tileSet->GetTileWidth();   
         }
-        if((contPos+1)%GetWidth() == 0 && contPos!=0){
-            x = cameraX;
-            y+= tileSet->GetTileHeight();
-        }else{
-            x+=tileSet->GetTileWidth();
-        }
-        contPos++;
+        x = cameraX;
+        y+= tileSet->GetTileHeight();
     }
-    
 }
 
 /*
@@ -113,9 +96,13 @@ void TileMap::RenderLayer(int layer, int cameraX, int cameraY){
 */
 void TileMap::Render(){
     for(int layer = 0; layer < mapDepth; layer++){
-        RenderLayer(layer, associated.box.x,associated.box.y);
+        RenderLayer(layer, associated.box.x*ParallaxScrolling(layer),associated.box.y*ParallaxScrolling(layer));
     }
     
+}
+
+int TileMap::ParallaxScrolling(int val){
+    return (val + 1);
 }
 
 int TileMap::GetWidth(){
