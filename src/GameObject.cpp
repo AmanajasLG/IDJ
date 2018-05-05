@@ -3,6 +3,7 @@
 
 GameObject::GameObject(){
     isDead = false;
+    started = false;
 }
 
 /*
@@ -51,7 +52,11 @@ void GameObject::RequestDelete(){
 /*
 Adiciona o componente ao vetor de componentes.
 */
-void GameObject::AddComponent(Component *cpt){   
+void GameObject::AddComponent(Component *cpt){
+    if(started){
+        cpt->Start();
+    }   
+    
     components.emplace_back(std::move(cpt));
 }
 
@@ -85,4 +90,12 @@ Component *GameObject::GetComponent(std::string type){
     }
 
     return nullptr;
+}
+
+void GameObject::Start(){
+    for(int i = 0; i < components.size(); i++){
+        components[i]->Start();
+    }
+
+    started = true;
 }

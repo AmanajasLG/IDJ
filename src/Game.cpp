@@ -78,7 +78,7 @@ Game::~Game(){
     Run é um simples loop, que funciona enquanto QuitRequested não retornar true. Dentro desse loop, chamamos Update e Render do estado. Em seguida, chamamos a função SDL_RenderPresent, que força o renderizador passado como argumento a atualizar a tela com as últimas renderizações feitas. Sem chamar essa função,a janela continuará vazia.
 */
 void Game::Run(){
-    state->LoadAssets();
+    state->Start();
     
     while(!state->QuitRequested()){
         InputManager::GetInstance().Update();

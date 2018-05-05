@@ -43,10 +43,7 @@ void Sound::Render(){
 }
 
 bool Sound::Is(std::string type){
-    if(strcmp(type.c_str(),"Sound") == 0){
-        return true;
-    }
-    return false;
+    return strcmp(type.c_str(),"Sound") == 0;
 }
 
 bool Sound::SoundIsPlaying(){

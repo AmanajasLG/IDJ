@@ -1,6 +1,7 @@
 #include "../include/Sprite.h" 
 #include "../include/Resources.h"
 #include "../include/Game.h"
+#include "../include/Camera.h"
 
 
 /*
@@ -54,8 +55,8 @@ Render é um wrapper para SDL_RenderCopy, que recebe quatro argumentos.
     ● SDL_Rect* dstrect: O retângulo destino. Determina a posição na tela em que a textura deve ser renderizada membros x e y). Se os membros w e h diferirem das dimensões do clip,causarão uma mudança na escala, contraindo ou expandindo a imagem para se adaptar a esses valores.
 */
 void Sprite::Render(){
-    Sprite::Render(associated.box.x, associated.box.y);
-    //Sprite::Render(associated.box.x - Camera::pos.x, associated.box.y - Camera::pos.y);
+    //Sprite::Render(associated.box.x, associated.box.y);
+    Sprite::Render(associated.box.x + Camera::pos.x, associated.box.y + Camera::pos.y);
 }
 
 void Sprite::Render(int x, int y){
@@ -87,17 +88,11 @@ int Sprite::GetHeight(){
 Retorna true se texture estive alocada.
 */
 bool Sprite::IsOpen(){
-    if(texture != nullptr){
-        return true;
-    }
-    return false;
+    return texture != nullptr;
 }
 
 bool Sprite::Is(std::string type){
-    if(strcmp(type.c_str(),"Sprite") == 0){
-        return true;
-    }
-    return false;
+    return strcmp(type.c_str(),"Sprite") == 0;
 }
 
 void Sprite::Update(float dt){

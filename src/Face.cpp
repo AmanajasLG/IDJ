@@ -27,28 +27,17 @@ void Face::Damage(int damage){
 }
 
 void Face::Update(float dt){
+    
 }
 
 void Face::Render(){
-    
-    if(InputManager::GetInstance().IsKeyDown(SDLK_UP) || InputManager::GetInstance().IsKeyDown(SDLK_w) ){
-        associated.box.y += abs((int)Camera::speed.y);
-    }
-    if(InputManager::GetInstance().IsKeyDown(SDLK_DOWN) || InputManager::GetInstance().IsKeyDown(SDLK_s)){
-        associated.box.y -= abs((int)Camera::speed.y);
-    }
-    if(InputManager::GetInstance().IsKeyDown(SDLK_LEFT) || InputManager::GetInstance().IsKeyDown(SDLK_a)){
-        associated.box.x += abs((int)Camera::speed.x);
-    }
-    if(InputManager::GetInstance().IsKeyDown(SDLK_RIGHT) || InputManager::GetInstance().IsKeyDown(SDLK_d)){
-        associated.box.x -= abs((int)Camera::speed.x);
-    }
 
 }
 
 bool Face::Is(std::string type){
-    if(strcmp(type.c_str(),"Face") == 0){
-        return true;
-    }
-    return false;
+    return strcmp(type.c_str(),"Face") == 0;
+}
+
+void Face::Start(){
+    
 }

@@ -18,6 +18,7 @@ class GameObject{
 private:
     std::vector<unique_ptr<Component>> components;
     bool isDead;
+    bool started;
 
 public:
     Rect box;
@@ -39,4 +40,6 @@ public:
     void RemoveComponent(Component *cpt);
 
     Component* GetComponent(std::string type);    
+
+    void Start();
 };

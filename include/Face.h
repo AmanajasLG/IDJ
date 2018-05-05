@@ -21,4 +21,6 @@ public:
     void Render();
 
     bool Is(std::string type);
+
+    void Start();
 };

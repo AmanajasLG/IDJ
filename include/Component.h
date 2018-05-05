@@ -27,4 +27,6 @@ public:
     void virtual Render() = 0;
 
     bool virtual Is(std::string type)= 0;
+
+    void virtual Start();
 };

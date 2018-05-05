@@ -7,6 +7,7 @@
 #include "../include/TileMap.h"
 #include "../include/InputManager.h"
 #include "../include/Camera.h"
+#include "../include/Alien.h"
 #include <math.h>
 
 /* 
@@ -14,6 +15,7 @@
 */ 
 State::State(){
     quitRequested = false;
+	started = false;
 
 	// Mudança T2
     GameObject *background = new GameObject();
@@ -32,6 +34,21 @@ State::State(){
 	TileMap *tilemap = new TileMap(*gameTile,"assets/map/tileMap.txt", tileset);
 	gameTile->AddComponent(tilemap);
 	objectArray.emplace_back(std::move(gameTile));
+
+	// Cria alien - T4
+	GameObject *alienGO = new GameObject();
+	Sprite *sprite = new Sprite(*alienGO, "assets/img/alien.png");
+	Alien *alien = new Alien(*alienGO, 2);
+
+	alienGO->AddComponent(sprite);
+	alienGO->AddComponent(alien);
+
+	alienGO->box.w = sprite->GetWidth();
+	alienGO->box.h = sprite->GetHeight();
+	alienGO->box.x = 512 - alienGO->box.w/2 + Camera::pos.x;
+	alienGO->box.y = 300 - alienGO->box.h/2 + Camera::pos.y;
+
+	objectArray.emplace_back(std::move(alienGO));
 }
 
 State::~State(){
@@ -70,7 +87,7 @@ void State::Update(float dt){
 				// Esse código, assim como a classe Face, é provisório. Futuramente, para
 				// chamar funções de GameObjects, use objectArray[i]->função() direto.
 
-				if(go->box.Contains(InputManager::GetInstance().GetMouseX(), InputManager::GetInstance().GetMouseY()) ) {
+				if(go->box.Contains(InputManager::GetInstance().GetMouseX() - Camera::pos.x, InputManager::GetInstance().GetMouseY() - Camera::pos.y) ) {
 					Face* face = (Face*)go->GetComponent( "Face" );
 					if ( nullptr != face ) {
 						// Aplica dano
@@ -103,6 +120,10 @@ void State::Update(float dt){
 
 	for(int i = 0;(size_t)i<objectArray.size();i++){
 		if(objectArray[i]->IsDead()){
+			if(objectArray[i]->GetComponent("Bullet") != nullptr)
+				objectArray.erase(objectArray.begin() + i);
+				continue;
+			
 			Sound* sound = (Sound*)objectArray[i]->GetComponent("Sound");
 			if(!sound->SoundIsPlaying()){
 				objectArray.erase(objectArray.begin() + i);
@@ -115,11 +136,17 @@ void State::Update(float dt){
 
 void State::Render(){
     for(int i = 0;(size_t)i<objectArray.size();i++){
-		if(objectArray[i]->GetComponent("TileMap") != nullptr){
-			objectArray[i]->box.x = Camera::pos.x;
-			objectArray[i]->box.y = Camera::pos.y;
+		if(i == 0){
+			Sprite *sprite = (Sprite*)objectArray[i]->GetComponent("Sprite");
+			sprite->Render(0,0);	
+		}else{
+
+			if(objectArray[i]->GetComponent("TileMap") != nullptr){
+				objectArray[i]->box.x = Camera::pos.x;
+				objectArray[i]->box.y = Camera::pos.y;
+			}
+			objectArray[i]->Render();
 		}
-		objectArray[i]->Render();
 	}
 }
 
@@ -135,12 +162,50 @@ void State::AddObject(int mouseX, int mouseY){
 	enemy->box.w = sprite->GetWidth();
 	enemy->box.h = sprite->GetHeight();
 
-	enemy->box.x = mouseX - enemy->box.w/2;
-	enemy->box.y = mouseY - enemy->box.h/2;
+	enemy->box.x = mouseX - enemy->box.w/2 - Camera::pos.x;
+	enemy->box.y = mouseY - enemy->box.h/2 - Camera::pos.y;
 
 	
 	enemy->AddComponent(sound);
 	
 	objectArray.emplace_back(std::move(enemy));	
+	
+}
+
+
+void State::Start(){
+	LoadAssets();
+
+	for(int i = 0; i < objectArray.size(); i++){
+		objectArray[i]->Start();
+	}
+
+	started = true;
+}
+
+std::weak_ptr<GameObject> State::AddObject(GameObject *go){
+	std::shared_ptr<GameObject> sharedGO(go);
+
+	objectArray.push_back(sharedGO);
+
+	if(started == true){
+		objectArray[objectArray.size() - 1]->Start();
+	}
+
+	std::weak_ptr<GameObject> weakGO(sharedGO);
+
+	return weakGO;
+}
+
+std::weak_ptr<GameObject> State::GetObjectPtr(GameObject *go){
+	for(int i = 0; i < objectArray.size(); i++){
+		if(objectArray[i].get() == go){
+			std::weak_ptr<GameObject> weakGO(objectArray[i]);
+			return weakGO;
+		}
+	}
+
+	std::weak_ptr<GameObject> weakGO;
+	return weakGO;
 	
 }

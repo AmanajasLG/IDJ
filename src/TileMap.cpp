@@ -122,8 +122,5 @@ void TileMap::Update(float dt){
 }
 
 bool TileMap::Is(std::string type){
-     if(strcmp(type.c_str(),"TileMap") == 0){
-        return true;
-    }
-    return false;
+    return strcmp(type.c_str(),"TileMap") == 0;
 }
