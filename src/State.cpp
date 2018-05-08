@@ -38,15 +38,15 @@ State::State(){
 	// Cria alien - T4
 	GameObject *alienGO = new GameObject();
 	Sprite *sprite = new Sprite(*alienGO, "assets/img/alien.png");
-	Alien *alien = new Alien(*alienGO, 2);
+	Alien *alien = new Alien(*alienGO, 6);
 
 	alienGO->AddComponent(sprite);
 	alienGO->AddComponent(alien);
 
 	alienGO->box.w = sprite->GetWidth();
 	alienGO->box.h = sprite->GetHeight();
-	alienGO->box.x = 512 - alienGO->box.w/2 + Camera::pos.x;
-	alienGO->box.y = 300 - alienGO->box.h/2 + Camera::pos.y;
+	alienGO->box.x = 512 - alienGO->box.w/2;
+	alienGO->box.y = 300 - alienGO->box.h/2;
 
 	objectArray.emplace_back(std::move(alienGO));
 }

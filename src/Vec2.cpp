@@ -46,7 +46,7 @@ void Vec2::NormalizeVec(Vec2 *vector){
 }
 
 float Vec2::Dist2Dots(Vec2 dot1, Vec2 dot2){
-    return sqrt((float)pow((dot2.x - dot1.x),2) + (float)pow((dot2.x - dot1.x),2));
+    return sqrt((float)pow((dot2.x - dot1.x),2) + (float)pow((dot2.y - dot1.y),2));
 }
 
 void Vec2::GetRotated(float angle){

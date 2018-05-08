@@ -16,6 +16,8 @@ Alien::Alien(GameObject &associated, int nMinions) : Component (associated) {
     speed.y = 0;
 
     minionArray.resize(nMinions);
+
+    arc = 0;
 }
 
 void Alien::Start(){
@@ -24,10 +26,11 @@ void Alien::Start(){
     std::weak_ptr<GameObject> weakGO(state.GetObjectPtr(&associated));
     for(int i = 0; i < minionArray.size(); i++){
         GameObject *go = new GameObject();
-        Minion *minion = new Minion(*go, weakGO, (i*2) *  M_PI/(minionArray.size()));
+        Minion *minion = new Minion(*go, weakGO, (i*2) *  M_PI/minionArray.size());
         go->AddComponent(minion);
         minionArray[i] = state.AddObject(go);
     }
+    
 }
 
 Alien::~Alien(){
@@ -51,7 +54,7 @@ void Alien::Update(float dt){
     if(InputManager::GetInstance().MousePressed(RIGHT_MOUSE_BUTTON)){
         Alien::Action action = Alien::Action(Action::ActionType::MOVE , InputManager::GetInstance().GetMouseX() - Camera::pos.x,InputManager::GetInstance().GetMouseY() - Camera::pos.y);
         taskQueue.emplace(action);
-    }
+    }  
 
     if(taskQueue.empty())
         return;
@@ -124,8 +127,6 @@ int Alien::ClosestMinion(){
             distMin = minionPos.Dist2Dots(minionPos,taskQueue.front().pos);
         } 
     }
-
-    std::cout<<"CLOSER: "<< closer <<endl;
 
     return closer;
 }

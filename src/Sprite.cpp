@@ -9,6 +9,10 @@ Seta texture como nullptr (imagem não carregada).
 */
 Sprite::Sprite(GameObject &associeted) : Component(associeted){
     texture = nullptr;
+
+    arc = 0;
+    scale.x = 1;
+    scale.y = 1;
 }
 
 /*
@@ -17,6 +21,10 @@ Seta texture como nullptr. Em seguida, chama Open.
 Sprite::Sprite(GameObject &associeted, string file) : Component(associeted){
     texture = nullptr;
     Open(file);
+
+    arc = 0;
+    scale.x = 1;
+    scale.y = 1;
 }
 
 /*
@@ -61,27 +69,27 @@ void Sprite::Render(){
 
 void Sprite::Render(int x, int y){
     SDL_Rect dstrect;
-    
+
     dstrect.x = x; 
     dstrect.y = y;
-    dstrect.h = clipRect.h;
-    dstrect.w = clipRect.w;
+    dstrect.h = clipRect.h * scale.y;
+    dstrect.w = clipRect.w * scale.x;
 
-    SDL_RenderCopy(Game::GetInstance().GetRenderer(), texture, &clipRect, &dstrect);   
+    SDL_RenderCopyEx(Game::GetInstance().GetRenderer(), texture, &clipRect, &dstrect,arc*180/M_PI, nullptr, SDL_FLIP_NONE);   
 }
 
 /*
 Retorna largura da imagem.
 */
 int Sprite::GetWidth(){
-    return width;
+    return width * scale.x;
 }
 
 /*
 Retorna altura da imagem.
 */
 int Sprite::GetHeight(){
-    return height;
+    return height * scale.y;
 }
     
 /*
@@ -97,4 +105,19 @@ bool Sprite::Is(std::string type){
 
 void Sprite::Update(float dt){
 
+}
+
+void Sprite::SetScaleX(float scaleX, float scaleY){
+    if(scaleX == 0 && scaleY != 0){
+        associated.box.y += height*scaleY - height*scale.y;
+        scale.y = scaleY;    
+    }else if(scaleX != 0 && scaleY == 0){
+        associated.box.x += width*scaleX - width*scale.x;
+        scale.x = scaleX;    
+    }else if(scaleX != 0 && scaleY != 0){
+        associated.box.x += width*scaleX - width*scale.x;
+        scale.x = scaleX;
+        associated.box.y += height*scaleY - height*scale.y;
+        scale.y = scaleY;
+    }
 }

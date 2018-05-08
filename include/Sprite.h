@@ -15,8 +15,11 @@ private:
     int width;              //dimensão largura
     int height;             //dimensão altura
     SDL_Rect clipRect;      //retangulo de clipping
+    Vec2 scale;
 
 public:
+    float arc;
+
     Sprite(GameObject &associeted);
 
     Sprite(GameObject &associeted,std::string file);
@@ -40,4 +43,8 @@ public:
     void Update(float dt);
 
     bool IsOpen();
+
+    void SetScaleX(float scaleX, float scaleY);
+
+    Vec2 GetScale();
 };

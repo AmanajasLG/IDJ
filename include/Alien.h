@@ -17,6 +17,7 @@ private:
     int hp;
     std::queue<Action> taskQueue;
     std::vector<std::weak_ptr<GameObject>> minionArray;
+    float arc;
 
 public:
 
