@@ -1,5 +1,6 @@
 #pragma once 
 #include "../include/Component.h"
+#include "../include/Timer.h"
 #include <queue>
 
 class Alien : public Component{
@@ -13,13 +14,18 @@ private:
         Action(ActionType type, float x, float y);
     };
 
+    enum AlienState{MOVING, RESTING};
+    AlienState state; 
+    Timer restTimer;
+    Vec2 destination;
     Vec2 speed;
     int hp;
     std::queue<Action> taskQueue;
     std::vector<std::weak_ptr<GameObject>> minionArray;
-    float arc;
+    
 
 public:
+    int alienCount;
 
     Alien(GameObject &associated, int nMinions);
 
@@ -33,5 +39,8 @@ public:
 
     bool Is(std::string type);
 
+    //int ClosestMinion(Vec2 target);
     int ClosestMinion();
+
+    void NotifyCollision(GameObject &other);
 };

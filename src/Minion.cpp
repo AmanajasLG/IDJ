@@ -2,11 +2,14 @@
 #include "../include/Sprite.h"
 #include "../include/Bullet.h"
 #include "../include/Game.h"
+#include "../include/Collider.h"
 #include <math.h>
 
 Minion::Minion(GameObject &associated, std::weak_ptr<GameObject> alienCenter, float arcOffsetDeg) : Component(associated), alienCenter(alienCenter){
     arc = arcOffsetDeg;
 
+    Collider *collider = new Collider(associated);
+    associated.AddComponent(collider);
     Sprite *sprite = new Sprite(associated, "assets/img/minion.png");
     
     float scale = (float) rand() / (RAND_MAX) + 1;
@@ -14,7 +17,7 @@ Minion::Minion(GameObject &associated, std::weak_ptr<GameObject> alienCenter, fl
         scale -= 0.5;
     
     
-    sprite->SetScaleX(scale,scale);
+    sprite->SetScale(scale,scale);
     sprite->arc = arcOffsetDeg;
     associated.AddComponent(sprite);
 
@@ -26,19 +29,36 @@ Minion::Minion(GameObject &associated, std::weak_ptr<GameObject> alienCenter, fl
     associated.box.y = sharedGO->box.y - associated.box.h/2;
 }
 
+Minion::~Minion(){
+    Sprite *spriteM = (Sprite*)associated.GetComponent("Sprite");
+    associated.RemoveComponent(spriteM);
+
+    GameObject *go = new GameObject();
+    go->box.x = associated.box.x - associated.box.w/2;
+    go->box.y = associated.box.y - associated.box.h/2;
+    Sprite *sprite = new Sprite(*go,"assets/img/miniondeath.png",4,1/2,2);
+    go->AddComponent(sprite);
+
+    State &state = Game::GetInstance().GetState();
+    state.AddObject(go);
+
+}
+
 void Minion::Update(float dt){
+    if(!alienCenter.lock()){
+        cout << associated.IsDead() << endl;
+        return;
+    }
+    
+
+    std::shared_ptr<GameObject> sharedGO(alienCenter.lock());
     
     Sprite *sprite = (Sprite*) associated.GetComponent("Sprite");
 
     Vec2 minionPos = Vec2(130, 0);
 
-    std::shared_ptr<GameObject> sharedGO(alienCenter.lock());
-
-    if(sharedGO == nullptr){
-        cout<<"MINION ALIENCENTER NULL!"<<endl;
-        return;
-    }
-    arc -= dt;
+    
+    arc -= dt*M_PI;
     minionPos.GetRotated(arc);
     
     sprite->arc = arc;
@@ -67,25 +87,26 @@ void Minion::Shoot(Vec2 target){
     GameObject *go = new GameObject();
     go->box.x = minionPos.x ;
     go->box.y = minionPos.y ;
-
-    if((target.x-minionPos.x) >= 0 && (target.x-minionPos.x) >= 0){
+    
+    if((target.x-minionPos.x) >= 0){
         adjust = 0;
-    }else if((target.x-minionPos.x) >= 0 && (target.x-minionPos.x) <= 0){
-        adjust = M_PI/2;
-    }else if((target.x-minionPos.x) <= 0 && (target.x-minionPos.x) <= 0){
+    }else if((target.x-minionPos.x) <= 0){
         adjust = M_PI;
-    }else{
-        adjust = 3*M_PI/2;
     }
 
     Bullet *bullet = new Bullet(*go,
                                 atan((target.y-minionPos.y)/(target.x-minionPos.x))+adjust,
-                                10,
+                                500,
                                 10,
                                 target.Dist2Dots(minionPos,target),
-                                "assets/img/minionbullet1.png");
+                                "assets/img/minionbullet2.png",
+                                3);
 
     go->AddComponent(bullet);
     State &state = Game::GetInstance().GetState();
     state.AddObject(go);
+}
+
+void Minion::NotifyCollision(GameObject &other){
+    
 }

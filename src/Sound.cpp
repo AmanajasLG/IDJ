@@ -49,3 +49,7 @@ bool Sound::Is(std::string type){
 bool Sound::SoundIsPlaying(){
     return Mix_Playing(channel);
 }
+
+void Sound::NotifyCollision(GameObject &other){
+    
+}

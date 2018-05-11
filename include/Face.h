@@ -23,4 +23,6 @@ public:
     bool Is(std::string type);
 
     void Start();
+
+    void NotifyCollision(GameObject &other);
 };

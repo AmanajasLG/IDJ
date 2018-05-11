@@ -128,7 +128,7 @@ Game& Game::GetInstance(){
 */
 void Game::CalculateDeltaTime(){
     int frameEnd = SDL_GetTicks();
-    dt = floor((frameEnd - frameStart)/10);
+    dt = (frameEnd - frameStart)/1000.0f;
     frameStart = frameEnd;
 }
 

@@ -40,4 +40,6 @@ public:
     bool Is(std::string type);
 
     bool SoundIsPlaying();
+
+    void NotifyCollision(GameObject &other);
 };

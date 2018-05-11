@@ -2,6 +2,7 @@
 #define INCLUDE_SDL_IMAGE
 #include "../include/SDL_include.h"
 #include "../include/Component.h"
+#include "../include/Timer.h"
 #include <iostream>
 #include <string>
 using namespace std;
@@ -16,13 +17,19 @@ private:
     int height;             //dimensão altura
     SDL_Rect clipRect;      //retangulo de clipping
     Vec2 scale;
+    int frameCount;
+    int currentFrame;
+    float timeElapsed;
+    float frameTime;
+    Timer timer;
+    
 
 public:
     float arc;
 
-    Sprite(GameObject &associeted);
+    Sprite(GameObject &associeted, int frameCount = 1, float frameTime = 1, float timeMax = 0);
 
-    Sprite(GameObject &associeted,std::string file);
+    Sprite(GameObject &associeted,std::string file, int frameCount = 1, float frameTime = 1, float timeMax = 0);
 
     ~Sprite();
 
@@ -44,7 +51,15 @@ public:
 
     bool IsOpen();
 
-    void SetScaleX(float scaleX, float scaleY);
+    void SetScale(float scaleX, float scaleY);
 
     Vec2 GetScale();
+
+    void SetFrame(int frame);
+
+    void SetFrameCount(int frameCount);
+
+    void SetFrameTime(float frameTime);
+
+    void NotifyCollision(GameObject &other);
 };

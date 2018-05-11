@@ -47,6 +47,7 @@ bool GameObject::IsDead(){
 }
 
 void GameObject::RequestDelete(){
+    //cout<<"MORRE DIABO!" <<endl;
     isDead = true;
 }
 
@@ -94,9 +95,16 @@ Component *GameObject::GetComponent(std::string type){
 }
 
 void GameObject::Start(){
+    
     for(int i = 0; i < components.size(); i++){
         components[i]->Start();
     }
 
     started = true;
+}
+
+void GameObject::NotifyCollision(GameObject &other){
+    for(int i = 0; i < components.size(); i++){
+        components[i]->NotifyCollision(other);
+    }
 }

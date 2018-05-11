@@ -1,10 +1,13 @@
 #include "../include/Bullet.h"
 #include "../include/Sprite.h"
 #include "../include/InputManager.h"
+#include "../include/Collider.h"
 
-Bullet::Bullet(GameObject &associated, float angle, float speed, int damage, float maxDistance, std::string sprite) : Component(associated){
-    Sprite *spriteS = new Sprite(associated,sprite);
+Bullet::Bullet(GameObject &associated, float angle, float speed, int damage, float maxDistance, std::string sprite, int numFrames) : Component(associated){
+    Sprite *spriteS = new Sprite(associated,sprite,numFrames);
     spriteS->arc = angle;
+    Collider *collider = new Collider(associated);
+    associated.AddComponent(collider);
     associated.AddComponent(spriteS);
     
     associated.box.w = spriteS->GetWidth();
@@ -12,6 +15,8 @@ Bullet::Bullet(GameObject &associated, float angle, float speed, int damage, flo
 
     this->speed.x = speed * cos(angle);
     this->speed.y = speed * sin(angle);
+
+    
 
     distanceLeft = maxDistance;
     this->damage = damage;
@@ -38,4 +43,13 @@ bool Bullet::Is(std::string type){
 
 int Bullet::GetDamage(){
     return damage;
+}
+
+void Bullet::NotifyCollision(GameObject &other){
+    Bullet *bullet = (Bullet*)other.GetComponent("Bullet");
+    if(bullet == nullptr){
+        return;
+    }
+
+    associated.RequestDelete();
 }

@@ -7,19 +7,33 @@
 /*
 Seta texture como nullptr (imagem não carregada).
 */
-Sprite::Sprite(GameObject &associeted) : Component(associeted){
+Sprite::Sprite(GameObject &associeted, int frameCount, float frameTime, float timeMax) : Component(associeted){
     texture = nullptr;
 
     arc = 0;
     scale.x = 1;
     scale.y = 1;
+
+    timer = Timer(timeMax);
+
+    SetFrameCount(frameCount);
+    SetFrameTime(frameTime);
+    timeElapsed = 0;
+    currentFrame = 0;
 }
 
 /*
 Seta texture como nullptr. Em seguida, chama Open.
 */
-Sprite::Sprite(GameObject &associeted, string file) : Component(associeted){
+Sprite::Sprite(GameObject &associeted,std::string file, int frameCount, float frameTime, float timeMax) : Component(associeted){
     texture = nullptr;
+    SetFrameCount(frameCount);
+    SetFrameTime(frameTime);
+    timeElapsed = 0;
+    currentFrame = 0;
+
+    timer = Timer(timeMax);
+
     Open(file);
 
     arc = 0;
@@ -42,7 +56,7 @@ void Sprite::Open(string file){
 
     SDL_QueryTexture(texture,nullptr,nullptr,&width,&height);
 
-    SetClip(0,0,width,height);
+    SetClip(0,0,width/frameCount,height);
 }
 
 /*
@@ -82,7 +96,7 @@ void Sprite::Render(int x, int y){
 Retorna largura da imagem.
 */
 int Sprite::GetWidth(){
-    return width * scale.x;
+    return (width/frameCount) * scale.x;
 }
 
 /*
@@ -104,10 +118,21 @@ bool Sprite::Is(std::string type){
 }
 
 void Sprite::Update(float dt){
+    if(timer.Update(dt)){
+        associated.RequestDelete();
+        return;
+    }
 
+    timeElapsed += dt;
+
+    if(timeElapsed >= frameTime){
+        timeElapsed = 0;
+        currentFrame++;
+        SetFrame(currentFrame);        
+    }
 }
 
-void Sprite::SetScaleX(float scaleX, float scaleY){
+void Sprite::SetScale(float scaleX, float scaleY){
     if(scaleX == 0 && scaleY != 0){
         associated.box.y += height*scaleY - height*scale.y;
         scale.y = scaleY;    
@@ -120,4 +145,22 @@ void Sprite::SetScaleX(float scaleX, float scaleY){
         associated.box.y += height*scaleY - height*scale.y;
         scale.y = scaleY;
     }
+}
+
+void Sprite::SetFrame(int frame){
+    int selFrame = frame % frameCount;
+
+    SetClip(width*selFrame/frameCount,0,width/frameCount,height);
+}
+
+void Sprite::SetFrameCount(int frameCount){
+    this->frameCount = frameCount;
+}
+
+void Sprite::SetFrameTime(float frameTime){
+    this->frameTime = frameTime;
+}
+
+void Sprite::NotifyCollision(GameObject &other){
+    
 }

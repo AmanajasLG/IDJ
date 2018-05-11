@@ -41,3 +41,7 @@ bool Face::Is(std::string type){
 void Face::Start(){
     
 }
+
+void Face::NotifyCollision(GameObject &other){
+    
+}

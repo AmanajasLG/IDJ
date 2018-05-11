@@ -43,4 +43,6 @@ public:
     Component* GetComponent(std::string type);    
 
     void Start();
+
+    void NotifyCollision(GameObject &other);
 };

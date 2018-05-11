@@ -29,4 +29,6 @@ public:
     bool virtual Is(std::string type)= 0;
 
     void virtual Start();
+
+    void virtual NotifyCollision(GameObject &other);
 };

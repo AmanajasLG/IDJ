@@ -8,6 +8,9 @@
 #include "../include/InputManager.h"
 #include "../include/Camera.h"
 #include "../include/Alien.h"
+#include "../include/PenguinBody.h"
+#include "../include/Collider.h"
+#include "../include/Collision.h"
 #include <math.h>
 
 /* 
@@ -37,18 +40,36 @@ State::State(){
 
 	// Cria alien - T4
 	GameObject *alienGO = new GameObject();
-	Sprite *sprite = new Sprite(*alienGO, "assets/img/alien.png");
+	Sprite *spriteAlien = new Sprite(*alienGO, "assets/img/alien.png");
 	Alien *alien = new Alien(*alienGO, 6);
 
-	alienGO->AddComponent(sprite);
+	alienGO->AddComponent(spriteAlien);
 	alienGO->AddComponent(alien);
 
-	alienGO->box.w = sprite->GetWidth();
-	alienGO->box.h = sprite->GetHeight();
+	alienGO->box.w = spriteAlien->GetWidth();
+	alienGO->box.h = spriteAlien->GetHeight();
 	alienGO->box.x = 512 - alienGO->box.w/2;
 	alienGO->box.y = 300 - alienGO->box.h/2;
 
 	objectArray.emplace_back(std::move(alienGO));
+
+	// Cria pinguins - T6
+	GameObject *penguinsGO = new GameObject();
+	Sprite *spritePenguin = new Sprite(*penguinsGO,"assets/img/penguin.png");
+    PenguinBody *pbody = new PenguinBody(*penguinsGO);
+
+	penguinsGO->AddComponent(spritePenguin);
+	penguinsGO->AddComponent(pbody);
+
+	penguinsGO->box.w = spritePenguin->GetWidth();
+	penguinsGO->box.h = spritePenguin->GetHeight();
+	penguinsGO->box.x = 704 - penguinsGO->box.w/2;
+	penguinsGO->box.y = 640 - penguinsGO->box.h/2;
+
+	Camera::Follow(penguinsGO);
+
+	objectArray.emplace_back(std::move(penguinsGO));
+
 }
 
 State::~State(){
@@ -75,6 +96,7 @@ void State::LoadAssets(){
 }
 
 void State::Update(float dt){
+
 	for(int i = 0;i<6;i++){
 		if(InputManager::GetInstance().MousePressed(i)) {
 			// Percorrer de trás pra frente pra sempre clicar no objeto mais de cima
@@ -119,15 +141,36 @@ void State::Update(float dt){
 	}
 
 	for(int i = 0;(size_t)i<objectArray.size();i++){
-		if(objectArray[i]->IsDead()){
-			if(objectArray[i]->GetComponent("Bullet") != nullptr)
-				objectArray.erase(objectArray.begin() + i);
-				continue;
-			
+		Collider *colliderA = (Collider*)objectArray[i]->GetComponent("Collider");
+		if(colliderA != nullptr){
+			for(int j = i+1;(size_t)j<objectArray.size();j++){
+				Collider *colliderB = (Collider*)objectArray[j]->GetComponent("Collider");
+				if(colliderB != nullptr){
+					if(Collision::IsColliding(objectArray[i]->box,objectArray[j]->box,objectArray[i]->angleDeg,objectArray[j]->angleDeg)){
+						objectArray[i]->NotifyCollision(*objectArray[j]);
+						objectArray[j]->NotifyCollision(*objectArray[i]);
+					}
+				}
+			}
+		}
+	}
+
+	for(int i = 0;(size_t)i<objectArray.size();i++){
+		if(objectArray[i]->IsDead() && objectArray[i]->GetComponent("Minion") == nullptr){			
 			Sound* sound = (Sound*)objectArray[i]->GetComponent("Sound");
-			if(!sound->SoundIsPlaying()){
+			if(sound != nullptr){
+				if(!sound->SoundIsPlaying())
+					objectArray.erase(objectArray.begin() + i);
+			}else{
 				objectArray.erase(objectArray.begin() + i);
 			}			
+		}else if(objectArray[i]->IsDead()){
+		//if(objectArray[i]->GetComponent("Alien") != nullptr)
+		//	cout<<"GGGGGGGGGGGGGGGGGG\?\? ALIEN FILHO DA PUTAAAAAA "<<endl;
+		//if(objectArray[i]->GetComponent("PenguinBody") != nullptr)
+		//	cout<<"GGGGGGGGGGGGGGGGGG\?\? PENGUIN FILHO DA PUTAAAAAA "<<endl;
+		//if(objectArray[i]->GetComponent("Minion") != nullptr)
+		//	cout<<"GGGGGGGGGGGGGGGGGG\?\? MINION FILHO DA PUTAAAAAA "<<endl;
 		}
 		
 	}
@@ -155,7 +198,7 @@ void State::AddObject(int mouseX, int mouseY){
 	Sprite *sprite = new Sprite(*enemy, "assets/img/penguinface.png");
 	Sound *sound = new Sound(*enemy, "assets/audio/boom.wav");
 	Face *face = new Face(*enemy);
-
+	//sprite->SetScale(0.5,0.5);
 	enemy->AddComponent(face);
 	enemy->AddComponent(sprite);
 
