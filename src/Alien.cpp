@@ -177,7 +177,6 @@ void Alien::NotifyCollision(GameObject &other){
             }
         }
     }
-    cout<<"COLISION ALIEN HP = "<<hp<<endl;
 }
 
 int Alien::GetHP(){
