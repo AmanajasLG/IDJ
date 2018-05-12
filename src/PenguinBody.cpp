@@ -15,10 +15,8 @@ PenguinBody::PenguinBody(GameObject &associated) : Component(associated){
     Collider *collider = new Collider(associated);
     associated.AddComponent(collider);
 
-    player = (PenguinBody*)associated.GetComponent("PenguinBoby");
-
     hp = 100;
-    linearSpeed = 10;
+    linearSpeed = 0;
     angle = 0;
     speed.x = linearSpeed * cos(angle);
     speed.y = linearSpeed * sin(angle);
@@ -67,9 +65,6 @@ void PenguinBody::Update(float dt){
     associated.box.x += speed.x;
     associated.box.y += speed.y;
 
-    cout<<"X = "<<associated.box.x<<endl;
-    cout<<"Y = "<<associated.box.y<<endl;
-
     if(hp <= 0){
         associated.RequestDelete();
         pcannon.lock()->RequestDelete();
@@ -87,7 +82,7 @@ bool PenguinBody::Is(std::string type){
 
 void PenguinBody::NotifyCollision(GameObject &other){
     Bullet *bullet = (Bullet*)other.GetComponent("Bullet");
-    if(bullet != nullptr){
+    if(bullet != nullptr && bullet->targetsPlayer){
         hp -= bullet->GetDamage();
         if(hp <= 0){
             Camera::Unfollow();
@@ -95,27 +90,22 @@ void PenguinBody::NotifyCollision(GameObject &other){
             associated.RemoveComponent(spriteB);
             
             GameObject *go = new GameObject();
-            go->box.x = associated.box.x - associated.box.w/2;
-            go->box.y = associated.box.y - associated.box.h/2;
-            Sprite *sprite = new Sprite(*go,"assets/img/penguindeath.png",5,1/2,2);
+            Sprite *sprite = new Sprite(*go,"assets/img/penguindeath.png",5,0.2,1);
+            go->box.w = sprite->GetWidth();
+            go->box.h = sprite->GetHeight();
+            go->box.x = associated.box.x ;
+            go->box.y = associated.box.y ;
             go->AddComponent(sprite);
 
             State &state = Game::GetInstance().GetState();
             state.AddObject(go);
 
-            cout<<"PINGUIM FILHO DA PUTA" <<endl;           
             associated.RequestDelete();
         }
     }
-    cout<<"COLISÃO PINGUIM!!! HP = "<<hp <<endl;
+    cout<<"COLISION PENGUIN HP = "<<hp<<endl;
 }
 
-Vec2 PenguinBody::GetPos(){
-     
-    cout<<"VAI TOMA NO CUUUU"<<endl;
-    cout<<"X = "<<associated.box.x<<endl;
-    cout<<"Y = "<<Component::associated.box.y<<endl;
-    Vec2 pos = Vec2(associated.box.x,associated.box.y); 
-    cout<<"QUE QUE TA PEGANDO FDP\?\?\?"<<endl;
-    return pos;
+Vec2 PenguinBody::GetPos(){    
+    return Vec2(associated.box.x,associated.box.y);
 }

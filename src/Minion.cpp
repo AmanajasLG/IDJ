@@ -3,6 +3,7 @@
 #include "../include/Bullet.h"
 #include "../include/Game.h"
 #include "../include/Collider.h"
+#include "../include/Alien.h"
 #include <math.h>
 
 Minion::Minion(GameObject &associated, std::weak_ptr<GameObject> alienCenter, float arcOffsetDeg) : Component(associated), alienCenter(alienCenter){
@@ -30,26 +31,15 @@ Minion::Minion(GameObject &associated, std::weak_ptr<GameObject> alienCenter, fl
 }
 
 Minion::~Minion(){
-    Sprite *spriteM = (Sprite*)associated.GetComponent("Sprite");
-    associated.RemoveComponent(spriteM);
-
-    GameObject *go = new GameObject();
-    go->box.x = associated.box.x - associated.box.w/2;
-    go->box.y = associated.box.y - associated.box.h/2;
-    Sprite *sprite = new Sprite(*go,"assets/img/miniondeath.png",4,1/2,2);
-    go->AddComponent(sprite);
-
-    State &state = Game::GetInstance().GetState();
-    state.AddObject(go);
+    
 
 }
 
 void Minion::Update(float dt){
-    if(!alienCenter.lock()){
-        cout << associated.IsDead() << endl;
-        return;
-    }
     
+    if(alienCenter.lock() == nullptr){
+        return;
+    }    
 
     std::shared_ptr<GameObject> sharedGO(alienCenter.lock());
     
@@ -100,6 +90,7 @@ void Minion::Shoot(Vec2 target){
                                 10,
                                 target.Dist2Dots(minionPos,target),
                                 "assets/img/minionbullet2.png",
+                                true,
                                 3);
 
     go->AddComponent(bullet);
@@ -108,5 +99,6 @@ void Minion::Shoot(Vec2 target){
 }
 
 void Minion::NotifyCollision(GameObject &other){
-    
+        
 }
+

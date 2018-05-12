@@ -19,9 +19,6 @@ void Camera::Update(float dt){
         Camera::speed.x = 500;
         Camera::speed.y = 500;
 
-        cout<<"CAMERA X = "<<Camera::pos.x<<endl;
-        cout<<"CAMERA Y = "<<Camera::pos.y<<endl;
-
         if(InputManager::GetInstance().IsKeyDown(SDLK_UP)){
             Camera::speed.y *= dt;
             Camera::pos.y += Camera::speed.y;

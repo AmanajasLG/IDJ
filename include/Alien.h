@@ -39,8 +39,9 @@ public:
 
     bool Is(std::string type);
 
-    //int ClosestMinion(Vec2 target);
-    int ClosestMinion();
+    int ClosestMinion(Vec2 target);
 
     void NotifyCollision(GameObject &other);
+
+    int GetHP();
 };

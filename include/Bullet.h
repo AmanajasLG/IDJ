@@ -7,7 +7,9 @@ private:
     float distanceLeft;
     int damage;
 public:
-    Bullet(GameObject &associated, float angle, float speed, int damage, float maxDistance, std::string sprite, int numFrames = 1);
+    bool targetsPlayer;
+
+    Bullet(GameObject &associated, float angle, float speed, int damage, float maxDistance, std::string sprite, bool targetsPlayer, int numFrames = 1);
 
     void Update(float dt);
 

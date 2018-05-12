@@ -3,7 +3,7 @@
 #include "../include/InputManager.h"
 #include "../include/Collider.h"
 
-Bullet::Bullet(GameObject &associated, float angle, float speed, int damage, float maxDistance, std::string sprite, int numFrames) : Component(associated){
+Bullet::Bullet(GameObject &associated, float angle, float speed, int damage, float maxDistance, std::string sprite, bool targetsPlayer, int numFrames) : Component(associated){
     Sprite *spriteS = new Sprite(associated,sprite,numFrames);
     spriteS->arc = angle;
     Collider *collider = new Collider(associated);
@@ -16,7 +16,7 @@ Bullet::Bullet(GameObject &associated, float angle, float speed, int damage, flo
     this->speed.x = speed * cos(angle);
     this->speed.y = speed * sin(angle);
 
-    
+    this->targetsPlayer = targetsPlayer;    
 
     distanceLeft = maxDistance;
     this->damage = damage;
@@ -46,10 +46,8 @@ int Bullet::GetDamage(){
 }
 
 void Bullet::NotifyCollision(GameObject &other){
-    Bullet *bullet = (Bullet*)other.GetComponent("Bullet");
-    if(bullet == nullptr){
-        return;
-    }
-
-    associated.RequestDelete();
+    if((other.GetComponent("Alien") != nullptr && !targetsPlayer) ||
+    (other.GetComponent("PenguinBody") != nullptr && targetsPlayer)){
+        associated.RequestDelete();
+    }    
 }

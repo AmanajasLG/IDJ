@@ -31,15 +31,15 @@ PenguinCannon::PenguinCannon(GameObject &associated, std::weak_ptr<GameObject> p
 
 void PenguinCannon::Update(float dt){
     timer.Update(dt);
-    cout<<"CARALHO"<<endl;
+
     if(pbody.lock() == nullptr){
-        cout<<"PORRE"<<endl;
+        
         Sprite* spriteC = (Sprite*)associated.GetComponent("Sprite");
         associated.RemoveComponent(spriteC);
         associated.RequestDelete();
         return;
     }
-    cout<<"FDP"<<endl;
+    
     associated.box.x = pbody.lock()->box.x + (pbody.lock()->box.w/2 - associated.box.w/2);
     associated.box.y = pbody.lock()->box.y + (pbody.lock()->box.h/2 - associated.box.h/2);
 
@@ -52,16 +52,12 @@ void PenguinCannon::Update(float dt){
     }
 
     angle = atan((InputManager::GetInstance().GetMouseY()-Camera::pos.y-associated.box.y)/(InputManager::GetInstance().GetMouseX()-Camera::pos.x-associated.box.x))+adjust;
-    
-    //atan((InputManager::GetInstance().GetMouseY()-associated.box.y)/(InputManager::GetInstance().GetMouseX()-associated.box.x))+adjust; 
-    //Sprite *sprite = (Sprite*)pbody.lock()->GetComponent("Sprite");
-    //angle = sprite->arc; 
 
     Sprite *spritePC = (Sprite*)associated.GetComponent("Sprite");
     spritePC->arc = angle;
 
     if(InputManager::GetInstance().MousePressed(LEFT_MOUSE_BUTTON)){
-        if(timer.Get() > 1){
+        if(timer.Get() > 0.5){
             Shoot();
             timer.Restart(); 
         }
@@ -106,6 +102,7 @@ void PenguinCannon::Shoot(){
                                 10,
                                 target.Dist2Dots(cannonPos,target),
                                 "assets/img/penguinbullet.png",
+                                false,
                                 4);
 
     go->AddComponent(bullet);

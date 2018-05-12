@@ -59,6 +59,7 @@ State::State(){
     PenguinBody *pbody = new PenguinBody(*penguinsGO);
 
 	penguinsGO->AddComponent(spritePenguin);
+	pbody->player = pbody;
 	penguinsGO->AddComponent(pbody);
 
 	penguinsGO->box.w = spritePenguin->GetWidth();
@@ -165,12 +166,8 @@ void State::Update(float dt){
 				objectArray.erase(objectArray.begin() + i);
 			}			
 		}else if(objectArray[i]->IsDead()){
-		//if(objectArray[i]->GetComponent("Alien") != nullptr)
-		//	cout<<"GGGGGGGGGGGGGGGGGG\?\? ALIEN FILHO DA PUTAAAAAA "<<endl;
-		//if(objectArray[i]->GetComponent("PenguinBody") != nullptr)
-		//	cout<<"GGGGGGGGGGGGGGGGGG\?\? PENGUIN FILHO DA PUTAAAAAA "<<endl;
-		//if(objectArray[i]->GetComponent("Minion") != nullptr)
-		//	cout<<"GGGGGGGGGGGGGGGGGG\?\? MINION FILHO DA PUTAAAAAA "<<endl;
+		
+			objectArray.erase(objectArray.begin() + i);
 		}
 		
 	}

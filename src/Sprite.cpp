@@ -14,12 +14,12 @@ Sprite::Sprite(GameObject &associeted, int frameCount, float frameTime, float ti
     scale.x = 1;
     scale.y = 1;
 
-    timer = Timer(timeMax);
+    timer = Timer(frameCount*frameTime*timeMax);
 
     SetFrameCount(frameCount);
     SetFrameTime(frameTime);
     timeElapsed = 0;
-    currentFrame = 0;
+    currentFrame = 0; 
 }
 
 /*
@@ -32,7 +32,7 @@ Sprite::Sprite(GameObject &associeted,std::string file, int frameCount, float fr
     timeElapsed = 0;
     currentFrame = 0;
 
-    timer = Timer(timeMax);
+    timer = Timer(frameCount*frameTime*timeMax);
 
     Open(file);
 
