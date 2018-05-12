@@ -103,7 +103,6 @@ void PenguinBody::NotifyCollision(GameObject &other){
             associated.RequestDelete();
         }
     }
-    cout<<"COLISION PENGUIN HP = "<<hp<<endl;
 }
 
 Vec2 PenguinBody::GetPos(){    
