@@ -11,6 +11,7 @@
 
 PenguinBody *PenguinBody::player;
 int overLimit;
+int limitX,limitY;
 
 PenguinBody::PenguinBody(GameObject &associated) : Component(associated){
     Collider *collider = new Collider(associated);
@@ -65,17 +66,22 @@ void PenguinBody::Update(float dt){
     
     if((associated.box.x > (1408 - associated.box.w) || associated.box.y > (1280 - associated.box.h)) ||
     (associated.box.x < 0 || associated.box.y < 0)){
-        overLimit = 10;
-        //associated.box.x = 704 - associated.box.w/2;
-	    //associated.box.y = 640 - associated.box.h/2;
-    }//else{
-       // associated.box.x += speed.x;
-       // associated.box.y += speed.y;
-    //}
+        overLimit = 10;   
+        if(associated.box.x > (1408 - associated.box.w)){
+            associated.box.x = (1408 - associated.box.w);
+        }else if( associated.box.x < 0){
+            associated.box.x = 0;
+        }
+        if(associated.box.y > (1280 - associated.box.w)){
+            associated.box.y = (1280 - associated.box.w);
+        }else if( associated.box.y < 0){
+            associated.box.y = 0;
+        }
+    }
 
     if(overLimit){
-        associated.box.x -= speed.x * overLimit/10;
-        associated.box.y -= speed.y * overLimit/10;
+        associated.box.x -= speed.x/10 * overLimit/10;
+        associated.box.y -= speed.y/10 * overLimit/10;
 
         overLimit--;
     }else{
