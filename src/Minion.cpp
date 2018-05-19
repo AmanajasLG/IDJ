@@ -94,7 +94,7 @@ void Minion::Shoot(Vec2 target){
                                 3);
 
     go->AddComponent(bullet);
-    State &state = Game::GetInstance().GetState();
+    State &state = Game::GetInstance().GetCurrentState();
     state.AddObject(go);
 }
 

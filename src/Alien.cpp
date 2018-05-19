@@ -9,13 +9,13 @@
 #include "../include/Bullet.h"
 #include "../include/PenguinBody.h"
 
-Alien::Alien(GameObject &associated, int nMinions) : Component (associated) {
+Alien::Alien(GameObject &associated, int nMinions, float timeOffset) : Component (associated) {
     Collider *collider = new Collider(associated);
     associated.AddComponent(collider);
 
     alienCount++;
     state = AlienState::RESTING;
-    restTimer = Timer(2);
+    restTimer = Timer(timeOffset);
 
     hp = 100;
     speed.x = 0;
@@ -25,7 +25,7 @@ Alien::Alien(GameObject &associated, int nMinions) : Component (associated) {
 }
 
 void Alien::Start(){
-    State &state = Game::GetInstance().GetState();
+    State &state = Game::GetInstance().GetCurrentState();
     
     std::weak_ptr<GameObject> weakGO(state.GetObjectPtr(&associated));
     for(int i = 0; i < minionArray.size(); i++){
@@ -37,7 +37,7 @@ void Alien::Start(){
     
 }
 
-Alien::~Alien(){   
+Alien::~Alien(){
 
     for(auto& m : minionArray){
         m.lock()->RequestDelete();
@@ -47,12 +47,6 @@ Alien::~Alien(){
     minionArray.clear();
 
     alienCount--;
-}
-
-Alien::Action::Action(ActionType type, float x, float y):
-type(type){
-    pos.x = x;
-    pos.y = y;
 }
 
 void Alien::Update(float dt){
@@ -99,10 +93,6 @@ void Alien::Update(float dt){
             }else if(speed.y != 0){
                 associated.box.y += (int)speed.y;
             }
-                
-            if(abs(-(int)associated.box.x + (int)destination.x - (int)associated.box.w/2) < abs((int)speed.x) && abs(-(int)associated.box.y + (int)destination.y - (int)associated.box.h/2) < abs((int)speed.y)){
-                taskQueue.pop();
-            }
         }
 
     }
@@ -115,10 +105,7 @@ void Alien::Render(){
 }
  
 bool Alien::Is(std::string type){
-    if(strcmp(type.c_str(),"Alien") == 0){
-        return true;
-    }
-    return false;
+    return strcmp(type.c_str(),"Alien") == 0;
 }
  
 int Alien::ClosestMinion(Vec2 target){
@@ -155,7 +142,7 @@ void Alien::NotifyCollision(GameObject &other){
         
             go->AddComponent(sprite);
 
-            State &state = Game::GetInstance().GetState();
+            State &state = Game::GetInstance().GetCurrentState();
             state.AddObject(go);
 
             associated.RequestDelete();
@@ -172,7 +159,7 @@ void Alien::NotifyCollision(GameObject &other){
                 go->box.y = m.lock()->box.y + go->box.h/2;
                 go->AddComponent(sprite);
 
-                State &state = Game::GetInstance().GetState();
+                State &state = Game::GetInstance().GetCurrentState();
                 state.AddObject(go);
             }
         }

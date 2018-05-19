@@ -1,6 +1,7 @@
 #pragma once 
 #include "../include/State.h"
 #include <string>
+#include <stack>
 using namespace std;
 
 /*
@@ -12,12 +13,13 @@ private:
     int width;
     int height;
     SDL_Window *window;
-    State *state;
+    State *storedState;
     static Game *instance;
     SDL_Renderer *renderer;
 
     int frameStart;
     float dt;
+    std::stack<std::unique_ptr<State>> stateStack;
     
     Game(string title, int width, int height);
 
@@ -30,12 +32,14 @@ public:
 
     SDL_Renderer* GetRenderer();
 
-    State& GetState();
+    State& GetCurrentState();
+
+    void Push(State *state);
 
     static Game& GetInstance();
 
-    bool TestaSaporra();
-
     float GetDeltaTime();
+
+    void PlayerWin();
 };
 

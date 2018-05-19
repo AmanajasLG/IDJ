@@ -10,6 +10,7 @@
 #include "../include/Bullet.h"
 
 PenguinBody *PenguinBody::player;
+int overLimit;
 
 PenguinBody::PenguinBody(GameObject &associated) : Component(associated){
     Collider *collider = new Collider(associated);
@@ -27,7 +28,7 @@ PenguinBody::~PenguinBody(){
 }
 
 void PenguinBody::Start(){
-    State &state = Game::GetInstance().GetState();
+    State &state = Game::GetInstance().GetCurrentState();
 
     GameObject *go = new GameObject();
     PenguinCannon *penguinCannon = new PenguinCannon(*go,state.GetObjectPtr(&associated));
@@ -61,9 +62,26 @@ void PenguinBody::Update(float dt){
 
     speed.x = linearSpeed * cos(angle);
     speed.y = linearSpeed * sin(angle);
+    
+    if((associated.box.x > (1408 - associated.box.w) || associated.box.y > (1280 - associated.box.h)) ||
+    (associated.box.x < 0 || associated.box.y < 0)){
+        overLimit = 10;
+        //associated.box.x = 704 - associated.box.w/2;
+	    //associated.box.y = 640 - associated.box.h/2;
+    }//else{
+       // associated.box.x += speed.x;
+       // associated.box.y += speed.y;
+    //}
 
-    associated.box.x += speed.x;
-    associated.box.y += speed.y;
+    if(overLimit){
+        associated.box.x -= speed.x * overLimit/10;
+        associated.box.y -= speed.y * overLimit/10;
+
+        overLimit--;
+    }else{
+        associated.box.x += speed.x;
+        associated.box.y += speed.y;
+    }   
 
     if(hp <= 0){
         associated.RequestDelete();
@@ -97,7 +115,7 @@ void PenguinBody::NotifyCollision(GameObject &other){
             go->box.y = associated.box.y ;
             go->AddComponent(sprite);
 
-            State &state = Game::GetInstance().GetState();
+            State &state = Game::GetInstance().GetCurrentState();
             state.AddObject(go);
 
             associated.RequestDelete();

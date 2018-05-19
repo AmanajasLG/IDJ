@@ -43,11 +43,9 @@ void PenguinCannon::Update(float dt){
     associated.box.x = pbody.lock()->box.x + (pbody.lock()->box.w/2 - associated.box.w/2);
     associated.box.y = pbody.lock()->box.y + (pbody.lock()->box.h/2 - associated.box.h/2);
 
-    float adjust; 
+    float adjust = 0; 
 
-    if((InputManager::GetInstance().GetMouseX()-Camera::pos.x-associated.box.x) >= 0){
-        adjust = 0;
-    }else if((InputManager::GetInstance().GetMouseX()-Camera::pos.x-associated.box.x) <= 0){
+    if((InputManager::GetInstance().GetMouseX()-Camera::pos.x-associated.box.x) <= 0){
         adjust = M_PI;
     }
 
@@ -106,7 +104,7 @@ void PenguinCannon::Shoot(){
                                 4);
 
     go->AddComponent(bullet);
-    State &state = Game::GetInstance().GetState();
+    State &state = Game::GetInstance().GetCurrentState();
     state.AddObject(go);
 }
 

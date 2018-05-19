@@ -1,5 +1,8 @@
 #include "../include/Game.h"
 #include "../include/InputManager.h"
+#include "../include/Resources.h"
+#define INCLUDE_SDL_TTF
+#include "../include/SDL_include.h"
 #include<cstdlib>
 #include<ctime>
 
@@ -52,12 +55,19 @@ Game::Game(string title, int width, int height){
         cout<< "Falha ao iniciar OpenAudio()!\n";
         return;
     }
-    Mix_AllocateChannels(32);    
+    Mix_AllocateChannels(32);  
+
+    if(TTF_Init()){
+        cout<< "Falha ao iniciar TTF_Init()!\n";
+        return;
+    }  
 
     srand(time(NULL));
 
     frameStart = SDL_GetTicks();
     dt = 0;
+
+    storedState = nullptr;
 }
 
 
@@ -65,7 +75,17 @@ Game::Game(string title, int width, int height){
     O destrutor desfaz as inicializações: deleta o estado, encerra a SDL_Music(Mix_CloseAudio e Mix_Quit) e a SDL_image (IMG_Quit), destrói o renderizador e a janela (SDL_DestroyRenderer, SDL_DestroyWindow), e, finalmente, encerra a SDL (SDL_Quit).
 */
 Game::~Game(){
-    delete state;
+    if(storedState != nullptr){
+        delete storedState;
+    }
+    while(stateStack.size()){
+        stateStack.pop();
+    }
+    Resources::ClearSounds();
+    Resources::ClearMusics();
+    Resources::ClearImages(); 
+    Resources::ClearFonts();
+    TTF_Quit();
     Mix_CloseAudio();
     Mix_Quit();
     IMG_Quit();
@@ -78,13 +98,35 @@ Game::~Game(){
     Run é um simples loop, que funciona enquanto QuitRequested não retornar true. Dentro desse loop, chamamos Update e Render do estado. Em seguida, chamamos a função SDL_RenderPresent, que força o renderizador passado como argumento a atualizar a tela com as últimas renderizações feitas. Sem chamar essa função,a janela continuará vazia.
 */
 void Game::Run(){
-    state->Start();
-    
-    while(!state->QuitRequested()){
+    if(storedState == nullptr){
+        return;
+    }
+
+    stateStack.push((std::unique_ptr<State>)storedState);
+    storedState = nullptr;
+
+    while(!stateStack.empty() && !stateStack.top()->QuitRequested()){
+        if(stateStack.top()->PopRequested()){
+            stateStack.pop();
+            if(!stateStack.empty()){
+                stateStack.top()->Resume();
+            }
+        }
+
+        if(stateStack.empty())
+            break;
+
+
+        if(storedState != nullptr){
+            stateStack.top()->Pause();
+            stateStack.push((std::unique_ptr<State>)storedState);
+            stateStack.top()->Start();
+            storedState = nullptr;
+        }
         InputManager::GetInstance().Update();
         CalculateDeltaTime();
-        state->Update(GetDeltaTime());
-        state->Render();
+        stateStack.top()->Update(GetDeltaTime());
+        stateStack.top()->Render();
         SDL_RenderPresent(renderer);
         SDL_RenderClear(renderer);
         SDL_Delay(33);
@@ -101,11 +143,8 @@ SDL_Renderer* Game::GetRenderer(){
 /*
     Retorna state
 */
-State& Game::GetState(){
-    if(state == nullptr){
-        state = new State();
-    }
-    return *state;
+State& Game::GetCurrentState(){
+    return *stateStack.top();
 }
 
 /*
@@ -117,7 +156,6 @@ Game& Game::GetInstance(){
         return *instance;
     }
     instance = new Game("Luiza_Amanajas_160056659",1024,600); 
-    instance->state = &instance->GetState();
     
     return *instance;
 }
@@ -134,4 +172,8 @@ void Game::CalculateDeltaTime(){
 
 float Game::GetDeltaTime(){
     return dt;
+}
+
+void Game::Push(State *state){
+    storedState = state;
 }

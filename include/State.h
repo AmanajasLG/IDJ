@@ -11,33 +11,45 @@ State é a responsável pela lógica específica do seu jogo. Game conhece apena
 
 class State {
 private:
-    Sprite *bg;
-    Music music;
-    bool quitRequested;
-    bool started;
-    std::vector< std::shared_ptr< GameObject > > objectArray;
+    //Sprite *bg;
+    //Music music;
 
 public:  
 
     State();
 
-    ~State();
+    virtual ~State();
+
+    void virtual LoadAssets() = 0;
+
+    void virtual Update(float dt) = 0;
+
+    void virtual Render() = 0;
+
+    void virtual Start() = 0;
+
+    void virtual Pause() = 0;
+
+    void virtual Resume() = 0;
+
+    std::weak_ptr<GameObject> virtual AddObject(GameObject *go);
+
+    std::weak_ptr<GameObject> virtual GetObjectPtr(GameObject *go);
 
     bool QuitRequested();
 
-    void LoadAssets();
+    bool PopRequested();
 
-    void Update(float dt);
+protected:
+    bool popRequested;
+    bool quitRequested;
+    bool started;
 
-    void Render();
+    std::vector< std::shared_ptr< GameObject > > objectArray;
 
-    void Input();
+    void StartArray();
 
-    void AddObject(int mouseX, int mouseY);
+    void virtual UpdateArray(float dt);
 
-    void Start();
-
-    std::weak_ptr<GameObject> AddObject(GameObject *go);
-
-    std::weak_ptr<GameObject> GetObjectPtr(GameObject *go);
+    void virtual RenderArray();
 };
