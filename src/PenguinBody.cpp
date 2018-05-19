@@ -51,12 +51,12 @@ void PenguinBody::Update(float dt){
     sprite->arc = angle;
     
     if(InputManager::GetInstance().IsKeyDown(SDLK_w)){
-        if(linearSpeed < 100){
+        if(linearSpeed < 50){
             linearSpeed += dt*10;
         }
     }
     if(InputManager::GetInstance().IsKeyDown(SDLK_s)){
-        if(linearSpeed > -100){
+        if(linearSpeed > -50){
             linearSpeed -= dt*10;
         }
     }
